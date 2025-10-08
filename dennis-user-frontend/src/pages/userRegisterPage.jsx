@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthConext.jsx";
 
 const UserRegisterPage = () => {
   const navigate = useNavigate();
+  const { register } = useContext(AuthContext);
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -24,9 +26,11 @@ const UserRegisterPage = () => {
     console.log("Form submitted:", formData);
 
     try {
-      const response = await axios.post("/api/auth/register", formData, {
-        withCredentials: true,
-      });
+      await register(
+        formData.username,
+        formData.email,
+        formData.password
+      );
       alert("✅ Registration successful!");
       setFormData({
         username: "",
@@ -131,7 +135,7 @@ const UserRegisterPage = () => {
           {/* Submit Button */}
           <button
             type="submit"
-            className="w-full py-2.5 mt-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md transition duration-200"
+            className="w-full py-2.5 mt-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md transition duration-200 cursor-pointer"
           >
             Create Account
           </button>
@@ -140,7 +144,7 @@ const UserRegisterPage = () => {
           <p className="text-sm text-center text-gray-600 mt-4">
             Already have an account?{" "}
             <a
-              onClick={() => navigate("/login")}
+              onClick={() => navigate("/loginUser")}
               className="text-blue-600 hover:text-blue-700 font-medium cursor-pointer"
             >
               Log in

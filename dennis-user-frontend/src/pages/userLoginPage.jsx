@@ -1,13 +1,15 @@
-import React, { useState } from "react";
-import axios from "axios";
+import React, { useState, useContext } from "react";
+import { AuthContext } from "../context/AuthConext.jsx";
 import { useNavigate } from "react-router-dom";
 
 const UserLoginPage = () => {
   const navigate = useNavigate();
+  const { login } = useContext(AuthContext); 
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -19,18 +21,18 @@ const UserLoginPage = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    console.log("Form submitted:", formData);
+    setLoading(true);
 
     try {
-      const response = await axios.post("/api/auth/login", formData, { withCredentials: true });
-      alert("✅ Login successful!");
-      setFormData({
-        email: "",
-        password: "",
-      });
+      await login(formData.email, formData.password);
+      // alert("✅ Login successful!");
       navigate("/");
     } catch (error) {
-      console.error("Error submitting form:", error);
+      console.error("Login failed:", error);
+      alert("❌ Invalid email or password");
+    } finally {
+      setLoading(false);
+      setFormData({ email: "", password: "" });
     }
   };
 
@@ -42,7 +44,6 @@ const UserLoginPage = () => {
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-5">
-
           {/* Email */}
           <div>
             <label
@@ -83,22 +84,23 @@ const UserLoginPage = () => {
             />
           </div>
 
-          {/* Submit Button */}
+          {/* Submit */}
           <button
             type="submit"
-            className="w-full py-2.5 mt-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md transition duration-200"
+            disabled={loading}
+            className="w-full py-2.5 mt-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md transition duration-200 disabled:opacity-60"
           >
-            LogIn Account
+            {loading ? "Logging in..." : "Login"}
           </button>
 
           {/* Extra text */}
           <p className="text-sm text-center text-gray-600 mt-4">
-            If you do not remember your password?{" "}
+            Forgot your password?{" "}
             <a
-              onClick={() => navigate("/login")}
-              className="text-blue-600 hover:text-blue-700 font-medium"
+              onClick={() => navigate("/reset-password")}
+              className="text-blue-600 hover:text-blue-700 font-medium cursor-pointer"
             >
-              Forgot Password
+              Reset here
             </a>
           </p>
         </form>
